@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity () {
 
     private fun initViewModel() {
         val model: TimesViewModel = ViewModelProviders.of(this).get(TimesViewModel.class)
-        model.getTimes().observe(this, new Observer<List<TimeEntry>>() {
+        model.getTimes().observe(this, Observer<List<TimeEntry>>() {
             @Override
             public void onChanged( List<TimeEntry> timeEntries) {
                 mTimesAdapter.setData(timeEntries);
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity () {
     private void start() {
         mRunning = true;
         mButton.setImageResource(R.drawable.ic_stop);
-        mThread = new StopwatchThread();
+        mThread = StopwatchThread();
         mThread.start();
     }
 
