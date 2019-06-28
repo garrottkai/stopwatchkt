@@ -13,6 +13,7 @@ import android.arch.lifecycle.ViewModelProviders
 
 import com.kaigarrott.stopwatchkt.data.TimeDatabase
 import com.kaigarrott.stopwatchkt.data.TimeEntry
+import java.util.*
 
 class MainActivity : AppCompatActivity () {
 
@@ -48,78 +49,62 @@ class MainActivity : AppCompatActivity () {
     }
 
     private fun initViewModel() {
-        val model: TimesViewModel = ViewModelProviders.of(this).get(TimesViewModel.class)
-        model.getTimes().observe(this, Observer<List<TimeEntry>>() {
-            @Override
-            public void onChanged( List<TimeEntry> timeEntries) {
-                mTimesAdapter.setData(timeEntries);
-            }
-        });
+        val model = ViewModelProviders.of(this).get(TimesViewModel::class.java)
+        model.times?.observe(this, Observer<List<TimeEntry>> { timeEntries -> mTimesAdapter?.setData(timeEntries) })
     }
 
-    private void start() {
-        mRunning = true;
-        mButton.setImageResource(R.drawable.ic_stop);
-        mThread = StopwatchThread();
-        mThread.start();
+    private fun start() {
+        mRunning = true
+        mButton?.setImageResource(R.drawable.ic_stop)
+        mThread = StopwatchThread()
+        mThread?.start()
     }
 
-    private void stop() {
-        mRunning = false;
-        mButton.setImageResource(R.drawable.ic_start);
-        if(mThread != null) mThread.interrupt();
-        mThread = null;
-        final TimeEntry newEntry = new TimeEntry(mBegin, mElapsed);
-        TaskExecutors.getInstance().db().execute(new Runnable() {
-            @Override
-            public void run() {
-                mDb.timeDao().insert(newEntry);
-            }
-        });
+    private fun stop() {
+        mRunning = false
+        mButton?.setImageResource(R.drawable.ic_start)
+        if (mThread != null) mThread?.interrupt()
+        mThread = null
+        val newEntry = TimeEntry(mBegin, mElapsed)
+        TaskExecutors.instance.db.execute { mDb?.timeDao()?.insert(newEntry) }
     }
 
-    public void toggle(View v) {
-        if(mRunning) {
-            stop();
+    fun toggle(v: View) {
+        if (mRunning) {
+            stop()
         } else {
-            start();
+            start()
         }
     }
 
-    private class StopwatchThread extends Thread {
-        @Override
-        public void run() {
+    private inner class StopwatchThread : Thread() {
+        override fun run() {
 
-            super.run();
-            mBegin = new Date().getTime();
+            super.run()
+            mBegin = Date().time
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mElapsed = 0;
-                    mOutputView.setText(getString(R.string.default_time_value));
-                }
-            });
+            runOnUiThread {
+                mElapsed = 0
+                mOutputView?.text = getString(R.string.default_time_value)
+            }
 
             try {
-                while(!this.isInterrupted()) {
+                while (!this.isInterrupted) {
 
-                    final long diff = new Date().getTime() - mBegin;
-                    final String out = Utils.format(diff);
+                    val diff = Date().time - mBegin
+                    val out = Utils.format(diff)
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mElapsed = diff;
-                            mOutputView.setText(out);
-                        }
-                    });
+                    runOnUiThread {
+                        mElapsed = diff
+                        mOutputView?.text = out
+                    }
 
-                    Thread.sleep(10);
+                    sleep(10)
 
                 }
-            } catch (InterruptedException e) {
+            } catch (e: InterruptedException) {
             }
+
         }
     }
 }

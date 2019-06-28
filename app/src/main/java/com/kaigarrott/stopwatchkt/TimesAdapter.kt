@@ -25,7 +25,7 @@ class TimesAdapter(private val mContext: Context) : RecyclerView.Adapter<TimesAd
         viewHolder.textView.text = Utils.format(mDataSet?.get(position)?.value)
     }
 
-    fun setData(timeEntries: List<TimeEntry>) {
+    fun setData(timeEntries: List<TimeEntry>?) {
         mDataSet = timeEntries
         notifyDataSetChanged()
     }

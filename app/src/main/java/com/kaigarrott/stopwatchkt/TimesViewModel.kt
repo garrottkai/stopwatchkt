@@ -9,7 +9,7 @@ import com.kaigarrott.stopwatchkt.data.TimeEntry
 
 class TimesViewModel(
         application: Application,
-        var db: TimeDatabase = TimeDatabase.getInstance(application),
-        val times: LiveData<List<TimeEntry>> = db.timeDao().getAll()
+        var db: TimeDatabase? = TimeDatabase.getInstance(application),
+        val times: LiveData<List<TimeEntry>>? = db?.timeDao()?.getAll()
 ) : AndroidViewModel (application)
 
